@@ -1,0 +1,15 @@
+.dub
+dub.selections.json
+docs.json
+__dummy.html
+docs/
+/ddcv
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+*.exe
+*.o
+*.obj
+*.lst

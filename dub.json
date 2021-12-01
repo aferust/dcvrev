@@ -1,0 +1,56 @@
+{
+    "name": "dcv",
+    "description": "Computer vision library for D programming language.",
+    "copyright": "Copyright © 2016, Relja Ljubobratovic",
+    "authors": [
+        "Relja Ljubobratovic",
+        "Ilya Yaroshenko",
+        "Henry Gouk",
+        "Dmitry Olshansky",
+        "Timothee Cour",
+        "Arun Chandrasekaran",
+        "The Gitter Badger",
+        "Ferhat Kurtulmuş"
+    ],
+    "license": "BSL-1.0",
+
+    "targetType": "none",
+    "versions": [
+        "GLFW_31",
+        "GL_11",
+        "GL_AllowDeprecated"
+    ],
+    "subPackages": [
+
+        {
+            "name": "core",
+            "sourcePaths": [ "core/dcv" ],
+            "importPaths": [ "core" ],
+            "dependencies":
+            {
+                "mir-algorithm": "3.11.4",
+                "imageformats": "7.0.2",
+                "bindbc-glfw": "~>1.0.0",
+                "bindbc-opengl": "~>1.0.0"
+            }
+        },
+        {
+            "name": "ffmpeg441",
+            "sourcePaths": [ "ffmpeg441/ffmpeg/" ],
+            "importPaths": [ "ffmpeg441"],
+            "libs": [
+                "avcodec", "avdevice", "avfilter", "avformat", "avutil",
+                "postproc", "swresample", "swscale"
+            ]
+        },
+        {
+            "name": "video",
+            "sourcePaths": [ "video/dcv/io/video" ],
+            "importPaths": [ "video" ],
+            "dependencies": {
+                "dcv:core": "*",
+                "dcv:ffmpeg441": "*"
+            }
+        }
+    ]
+}
