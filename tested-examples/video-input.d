@@ -30,6 +30,8 @@ void main(string[] args)
 
     InputStream inStream = new InputStream;
 
+    inStream.setVideoSizeRequest(640, 480);
+    
     string path; // path to the video
     InputStreamType type; // type of the stream (file or live)
     

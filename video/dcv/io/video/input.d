@@ -90,7 +90,7 @@ private:
     AVFormatContext* formatContext = null;
     AVStream* stream = null;
     InputStreamType type = InputStreamType.INVALID;
-
+    AVDictionary* options = null;
 public:
     this()
     {
@@ -320,6 +320,11 @@ public:
         }
     }
 
+    void setVideoSizeRequest(int width, int height){
+        import std.format;
+        av_dict_set(&options, "video_size", format!"%dx%d"(width, height).toStringz, 0);
+    }
+
 private:
 
     bool readFrameImpl(ref Image image)
@@ -381,7 +386,7 @@ private:
         int streamIndex = -1;
 
         // open file, and allocate format context
-        if (avformat_open_input(&formatContext, file, inputFormat, null) < 0)
+        if (avformat_open_input(&formatContext, file, inputFormat, &options) < 0)
         {
             debug writeln("Could not open stream for file: " ~ filepath);
             return false;
