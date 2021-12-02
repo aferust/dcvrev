@@ -385,6 +385,7 @@ private:
         const char* file = toStringz(filepath);
         int streamIndex = -1;
 
+        scope(exit) av_dict_free(&options);
         // open file, and allocate format context
         if (avformat_open_input(&formatContext, file, inputFormat, &options) < 0)
         {
