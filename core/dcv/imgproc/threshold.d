@@ -120,3 +120,47 @@ nothrow Slice!(OutputType*, N, Contiguous) threshold(OutputType, InputType, size
 {
     return threshold!(OutputType)(input, thresh, thresh, prealloc);
 }
+
+/** Return threshold value based on Otsu’s method based on the input histogram.
+
+Params:
+    hist = Input histogram.
+*/
+int getOtsuThresholdValue(alias N = size_t)(int[N] hist)
+{
+    // Based on: https://github.com/scikit-image/scikit-image/blob/602d94d35d3a04e6b66583c3a1a355bfbe381224/skimage/filters/thresholding.py#L371
+    
+    import mir.ndslice.topology : as, iota, retro;
+    import std.array : array;
+    import mir.algorithm.iteration : maxIndex, each;
+    import std.algorithm.iteration: cumulativeFold;
+    import std.math.traits : isNaN;
+    import std.stdio;
+    
+    
+    auto binCenters = iota(N).as!int.slice;
+    
+    auto weight1 = cumulativeFold!"a + b"(hist[], 0).array.as!float.slice;
+    auto weight2 = cumulativeFold!"a + b"(hist[].retro, 0).array.as!float.slice.retro;
+    
+
+    auto counts = hist.as!float.slice;
+
+    auto mult = counts * binCenters;
+
+    auto csmult = cumulativeFold!"a + b"(mult, 0.0).array.as!float.slice;
+    
+    auto mean1 = csmult / weight1;
+
+    auto csmult2 = cumulativeFold!"a + b"(mult.retro, 0.0).array.as!float.slice;
+    
+    auto mean2 = (csmult2 / weight2.retro).retro.slice;
+    mean2.each!((ref v){if(v.isNaN) v=cast(float)(N-1); });
+    
+    auto variance12 = weight1[0..$-1] * weight2[1..$] * (mean1[0..$-1] - mean2[1..$]) ^^ 2;
+    
+    auto idx = cast(ulong)variance12.maxIndex[0];
+    
+    
+    return binCenters[idx];
+}
