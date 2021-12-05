@@ -32,7 +32,8 @@
                 "imageformats": "7.0.2",
                 "bindbc-glfw": "~>1.0.0",
                 "bindbc-opengl": "~>1.0.0"
-            }
+            },
+            "dflags": ["-L/STACK:1500000000"]
         },
         {
             "name": "ffmpeg441",
