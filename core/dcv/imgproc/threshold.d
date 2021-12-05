@@ -131,28 +131,29 @@ int getOtsuThresholdValue(alias N = size_t)(int[N] hist)
     // Based on: https://github.com/scikit-image/scikit-image/blob/602d94d35d3a04e6b66583c3a1a355bfbe381224/skimage/filters/thresholding.py#L371
     
     import mir.ndslice.topology : as, iota, retro;
-    import std.array : array;
+    import std.range: std_iota = iota;
+    import std.array : staticArray;
     import mir.algorithm.iteration : maxIndex, each;
     import std.algorithm.iteration: cumulativeFold;
     import std.math.traits : isNaN;
     import std.stdio;
     
     
-    auto binCenters = iota(N).as!int.slice;
+    auto binCenters = std_iota!int(N).staticArray!N.as!int.slice;
     
-    auto weight1 = cumulativeFold!"a + b"(hist[], 0).array.as!float.slice;
-    auto weight2 = cumulativeFold!"a + b"(hist[].retro, 0).array.as!float.slice.retro;
+    auto weight1 = cumulativeFold!"a + b"(hist[], 0).staticArray!N.as!float.slice;
+    auto weight2 = cumulativeFold!"a + b"(hist[].retro, 0).staticArray!N.as!float.slice.retro;
     
 
     auto counts = hist.as!float.slice;
 
     auto mult = counts * binCenters;
 
-    auto csmult = cumulativeFold!"a + b"(mult, 0.0).array.as!float.slice;
+    auto csmult = cumulativeFold!"a + b"(mult, 0.0).staticArray!N.as!float.slice;
     
     auto mean1 = csmult / weight1;
 
-    auto csmult2 = cumulativeFold!"a + b"(mult.retro, 0.0).array.as!float.slice;
+    auto csmult2 = cumulativeFold!"a + b"(mult.retro, 0.0).staticArray!N.as!float.slice;
     
     auto mean2 = (csmult2 / weight2.retro).retro.slice;
     mean2.each!((ref v){if(v.isNaN) v=cast(float)(N-1); });
