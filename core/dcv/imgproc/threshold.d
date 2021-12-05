@@ -126,11 +126,12 @@ nothrow Slice!(OutputType*, N, Contiguous) threshold(OutputType, InputType, size
 Params:
     hist = Input histogram.
 */
-int getOtsuThresholdValue(alias N = size_t)(int[N] hist)
+int getOtsuThresholdValue(alias N = size_t)(int[N] hist) @nogc nothrow
 {
     // Based on: https://github.com/scikit-image/scikit-image/blob/602d94d35d3a04e6b66583c3a1a355bfbe381224/skimage/filters/thresholding.py#L371
     
     import mir.ndslice.topology : as, iota, retro;
+    import mir.ndslice.allocation : rcslice;
     import std.range: std_iota = iota;
     import std.array : staticArray;
     import mir.algorithm.iteration : maxIndex, each;
@@ -139,23 +140,23 @@ int getOtsuThresholdValue(alias N = size_t)(int[N] hist)
     import std.stdio;
     
     
-    auto binCenters = std_iota!int(N).staticArray!N.as!int.slice;
+    auto binCenters = std_iota!int(N).staticArray!N.as!int.rcslice;
     
-    auto weight1 = cumulativeFold!"a + b"(hist[], 0).staticArray!N.as!float.slice;
-    auto weight2 = cumulativeFold!"a + b"(hist[].retro, 0).staticArray!N.as!float.slice.retro;
+    auto weight1 = cumulativeFold!"a + b"(hist[], 0).staticArray!N.as!float.rcslice;
+    auto weight2 = cumulativeFold!"a + b"(hist[].retro, 0).staticArray!N.as!float.rcslice.retro;
     
 
-    auto counts = hist.as!float.slice;
+    auto counts = hist.as!float.rcslice;
 
     auto mult = counts * binCenters;
 
-    auto csmult = cumulativeFold!"a + b"(mult, 0.0).staticArray!N.as!float.slice;
+    auto csmult = cumulativeFold!"a + b"(mult, 0.0).staticArray!N.as!float.rcslice;
     
     auto mean1 = csmult / weight1;
 
-    auto csmult2 = cumulativeFold!"a + b"(mult.retro, 0.0).staticArray!N.as!float.slice;
+    auto csmult2 = cumulativeFold!"a + b"(mult.retro, 0.0).staticArray!N.as!float.rcslice;
     
-    auto mean2 = (csmult2 / weight2.retro).retro.slice;
+    auto mean2 = (csmult2 / weight2.retro).retro.rcslice;
     mean2.each!((ref v){if(v.isNaN) v=cast(float)(N-1); });
     
     auto variance12 = weight1[0..$-1] * weight2[1..$] * (mean1[0..$-1] - mean2[1..$]) ^^ 2;
