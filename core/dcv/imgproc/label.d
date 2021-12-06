@@ -190,7 +190,7 @@ private struct LabelizerV2
 Label connected components in 2-D binary image
 
 Params:
-    input = Input slice of 2-D binary image (Slice!(ubyte*, 2LU, SliceKind.contiguous)) .
+    input = Input slice of 2-D binary image (Slice!(ubyte*, 2LU, kind)) .
 */
 Slice!(ulong*, 2LU, SliceKind.contiguous)
 bwlabel(alias Conn = 8, alias Method = 1, SliceKind kind)(Slice!(ubyte*, 2LU, kind) input)
