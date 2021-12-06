@@ -22,10 +22,10 @@ struct XYList {
 }
 +/
 
-private struct LabelizerV1 
+private struct LabelizerV1(SliceT)
 {
 
-    Slice!(ubyte*, 2LU, SliceKind.contiguous) img;
+    SliceT img;
     Slice!(ulong*, 2LU, SliceKind.contiguous) label;
 
     size_t row_count;
@@ -96,9 +96,9 @@ private struct LabelizerV1
 }
 
 // WARNING !!! Output labels are not sequential with this method
-private struct LabelizerV2
+private struct LabelizerV2(SliceT)
 {
-    Slice!(ubyte*, 2LU, SliceKind.contiguous) input;
+    SliceT input;
     
     size_t w, h;
     ulong[] component;
@@ -202,10 +202,10 @@ in
 do
 {
     static if(Method == 1){
-        LabelizerV1 lblzr;
+        LabelizerV1!(typeof(input)) lblzr;
     }else
     static if(Method == 2){
-        LabelizerV2 lblzr;
+        LabelizerV2!(typeof(input)) lblzr;
     }
     
     return lblzr.labelize!(Conn)(input);
