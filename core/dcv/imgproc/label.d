@@ -196,8 +196,8 @@ Slice!(ulong*, 2LU, SliceKind.contiguous)
 bwlabel(alias Conn = 8, alias Method = 1, SliceKind kind)(Slice!(ubyte*, 2LU, kind) input)
 in
 {
-    assert(Conn == 4 && Conn == 8, "Connection rule must be either of 4 or 8");
-    assert(Method == 1 && Conn == 2, "Method must be either of 1 or 2");
+    assert(Conn == 4 || Conn == 8, "Connection rule must be either of 4 or 8");
+    assert(Method == 1 || Conn == 2, "Method must be either of 1 or 2");
 }
 do
 {
