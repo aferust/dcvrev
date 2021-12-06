@@ -13,6 +13,10 @@
 * dub packaging system was changed to use dcv modules as separate dependecies such as dcv:core, dcv:video, dcv:ffmpeg441
 * I only tested things on Windows.
 
+## newly-implemented functionality:
+* Otsu's method for threshold calculation
+* dcv.imgproc.label for labelling connected regions
+
 ## Need help for
 
 * updating the comments in the code which (I believe) create the docs.

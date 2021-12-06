@@ -121,7 +121,7 @@ nothrow Slice!(OutputType*, N, Contiguous) threshold(OutputType, InputType, size
     return threshold!(OutputType)(input, thresh, thresh, prealloc);
 }
 
-/** Return threshold value based on Otsu’s method based on the input histogram.
+/** Return threshold value based on Otsu’s method.
 
 Params:
     hist = Input histogram.
