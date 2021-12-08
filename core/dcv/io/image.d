@@ -167,9 +167,9 @@ Returns:
 */
 
 
-bool imwrite(SliceKind kind, size_t N, T)
+bool imwrite(SliceKind kind, size_t N, Iterator)
 (
-    Slice!(T*, N, kind) slice,
+    Slice!(Iterator, N, kind) slice,
     ImageFormat format,
     in string path
 )
@@ -177,8 +177,20 @@ bool imwrite(SliceKind kind, size_t N, T)
     //static assert(packs.length == 1, "Packed slices are not allowed in imwrite.");
     static assert(N == 2LU || N == 3LU, "Slice has to be 2 or 3 dimensional.");
 
+    import mir.rc: RCI;
+    import std.traits;
+    static if (__traits(isSame, TemplateOf!(IteratorOf!(typeof(slice))), RCI))
+    { // is refcounted?
+        alias ASeq = TemplateArgsOf!(IteratorOf!(typeof(slice)));
+        alias T = ASeq[0];
+    }else{ // is custom (GC) allocated
+        alias PointerOf(T : T*) = T;
+        alias P = IteratorOf!(typeof(slice));
+        alias T = PointerOf!P;
+    }
+
     int err;
-    auto sdata = slice.reshape([slice.elementsCount], err).array;
+    auto sdata = slice.reshape([slice.elementCount], err).array;
     assert(err == 0, "Internal error, cannot reshape the slice."); // should never happen, right?
 
     static if (is(T == ubyte))
