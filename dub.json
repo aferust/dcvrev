@@ -29,6 +29,7 @@
             "dependencies":
             {
                 "mir-algorithm": "3.11.4",
+                "mir-random": "2.2.19",
                 "imageformats": "7.0.2",
                 "bindbc-glfw": "~>1.0.0",
                 "bindbc-opengl": "~>1.0.0"

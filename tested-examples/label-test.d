@@ -20,21 +20,12 @@ int main(string[] args)
     auto thr = getOtsuThresholdValue(hist);
     auto imbin = threshold!ubyte(gray, cast(ubyte)thr);
 
-    auto sw = StopWatch(AutoStart.no);
-    sw.start();
-    auto labels = bwlabel(imbin);
-    sw.stop(); long msecs = sw.peek.total!"msecs";
-    writefln("%f", msecs);
     
-    // need a label2image function to visualize the results
-    // because ubyte is not enough for the number of regions larger than 256
-    // and small labels like 1,2,3 is not visible
-    auto lim = labels.as!ubyte.slice.asImage(ImageFormat.IF_MONO); 
+    auto labels = bwlabel(imbin);
+    
+    auto labelimg = label2rgb(labels); // a nice util to visualize the label matrix
 
-    imwrite("labels_out.png", lim.width, lim.height, lim.format, lim.depth, lim.data!ubyte);
-
-    imshow(imbin, "otsu");
-    imshow(lim, "labels"); // todo: label2image
+    imshow(labelimg.asImage, "labelimg"); 
     
     waitKey();
 

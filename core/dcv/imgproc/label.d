@@ -48,6 +48,46 @@ do
     return lblzr.labelize!(Conn)(input);
 }
 
+/** Return an RGB image where color-coded labels are painted over the image.
+
+Params:
+    hist = Label matrix.
+*/
+auto label2rgb(InputType)(InputType label) @nogc nothrow
+{
+    import mir.random;
+    import mir.random.variable;
+    import mir.ndslice.allocation;
+    import mir.ndslice.topology;
+    import mir.rc;
+    
+    Slice!(RCI!ubyte, 3LU, Contiguous) img = uninitRCslice!ubyte(label.shape[0], label.shape[1], 3);
+    img[] = 0;
+
+    auto index = label.maxIndex;
+
+    long nregions = label[index[0], index[1]];
+
+    auto gen = Random(unpredictableSeed);
+    auto rv = uniformVar(0, 255);
+
+    foreach (nr; 1..nregions+1)
+    {
+        ubyte[3] color;
+        color[0] = cast(ubyte)rv(gen);
+        color[1] = cast(ubyte)rv(gen);
+        color[2] = cast(ubyte)rv(gen);
+        size_t li;
+        label.each!((a){
+            if(a == nr)
+                img.ptr[3*li .. 3*li+3] = color[];
+            li++;
+        });
+    }
+
+    return img;
+}
+
 private struct LabelizerV1(SliceT)
 {
     Slice!(ulong*, 2LU, SliceKind.contiguous) label;
@@ -215,7 +255,7 @@ private struct LabelizerV2(SliceT)
    Fiorio, C., & Gustedt, J. (1996). Two linear time union-find strategies for image processing. Theoretical Computer Science, 154(2), 165-181.
 +/
 struct LabelizerV3{
-    auto labelize(alias Conn, SliceKind kind)(ref Slice!(ubyte*, 2LU, kind) input){
+    auto labelize(alias Conn, Iterator, SliceKind kind)(ref Slice!(Iterator, 2LU, kind) input){
         static if(Conn == 4){
            enum _conn = 1;
         }else

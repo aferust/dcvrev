@@ -522,9 +522,22 @@ unittest
 /**
 Convert a ndslice object to an Image, with defined image format.
 */
-Image asImage(T, size_t N, SliceKind kind)(Slice!(T*, N, kind) slice, ImageFormat format)
+Image asImage(Iterator, size_t N, SliceKind kind)(Slice!(Iterator, N, kind) slice, ImageFormat format)
 {
     static if(N == 1LU) static assert(0, "Packed slices are not supported.");
+
+    import mir.rc: RCI;
+    import std.traits;
+    
+    static if (__traits(isSame, TemplateOf!(IteratorOf!(typeof(slice))), RCI))
+    { // is refcounted?
+        alias ASeq = TemplateArgsOf!(IteratorOf!(typeof(slice)));
+        alias T = ASeq[0];
+    }else{ // is custom (GC) allocated
+        alias PointerOf(T : T*) = T;
+        alias P = IteratorOf!(typeof(slice));
+        alias T = PointerOf!P;
+    }
 
     BitDepth depth = getDepthFromType!T;
     enforce(depth != BitDepth.BD_UNASSIGNED, "Invalid type of slice for convertion to image: ", T.stringof);
@@ -555,8 +568,20 @@ Image asImage(T, size_t N, SliceKind kind)(Slice!(T*, N, kind) slice, ImageForma
 /**
 Convert ndslice object into an image, with default format setup, regarding to slice dimension.
 */
-Image asImage(T, size_t N, SliceKind kind)(Slice!(T*, N, kind) slice)
+Image asImage(Iterator, size_t N, SliceKind kind)(Slice!(Iterator, N, kind) slice)
 {
+    import mir.rc: RCI;
+    import std.traits;
+    
+    static if (__traits(isSame, TemplateOf!(IteratorOf!(typeof(slice))), RCI)){
+        alias ASeq = TemplateArgsOf!(IteratorOf!(typeof(slice)));
+        alias T = ASeq[0];
+    }else{
+        alias PointerOf(T : T*) = T;
+        alias P = IteratorOf!(typeof(slice));
+        alias T = PointerOf!P;
+    }
+
     ImageFormat format;
     static if (N == 2LU)
     {
