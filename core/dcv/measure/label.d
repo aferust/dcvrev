@@ -4,7 +4,7 @@ Copyright: Copyright Ferhat Kurtulmuş 2021.
 Authors: Ferhat Kurtulmuş
 License: $(LINK3 http://www.boost.org/LICENSE_1_0.txt, Boost Software License - Version 1.0).
 */
-module dcv.imgproc.label;
+module dcv.measure.label;
 
 import std.typecons: tuple, Tuple;
 import std.experimental.allocator.gc_allocator;

@@ -6,6 +6,7 @@ import dcv.core;
 import dcv.io.image;
 import dcv.plot;
 import dcv.imgproc;
+import dcv.measure;
 
 import mir.ndslice;
 

@@ -2,6 +2,7 @@
 public {
     import dcv.core;
     import dcv.features;
+    import dcv.measure;
     import dcv.imgproc;
     import dcv.io;
     import dcv.plot;
