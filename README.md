@@ -15,7 +15,8 @@
 
 ## newly-implemented functionality:
 * Otsu's method for threshold calculation
-* dcv.imgproc.label for labelling connected regions
+* dcv.measure.label for labelling connected regions
+* dcv.measure.contours
 
 ## Need help for
 
