@@ -438,6 +438,18 @@ public:
     {
         return data!T.sliced(height, width, channels);
     }
+
+    auto rcsliced(T = ubyte)() inout
+    {
+        import mir.ndslice.allocation : rcslice;
+        import mir.rc;
+
+        import core.lifetime: move;
+
+        Slice!(RCI!T, 3LU, Contiguous) ret = uninitRCslice!T(height, width, channels);
+        ret[] = data!T;
+        return ret.move;
+    }
 }
 
 version (unittest)

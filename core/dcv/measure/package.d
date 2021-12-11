@@ -12,5 +12,6 @@ module dcv.measure;
 public
 {
     import dcv.measure.label;
+    import dcv.measure.contours;
 
 }

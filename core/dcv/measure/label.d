@@ -51,7 +51,7 @@ do
 /** Return an RGB image where color-coded labels are painted over the image.
 
 Params:
-    hist = Label matrix.
+    label = Label matrix.
 */
 auto label2rgb(InputType)(InputType label) @nogc nothrow
 {
