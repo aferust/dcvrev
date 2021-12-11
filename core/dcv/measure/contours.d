@@ -18,7 +18,7 @@ struct Point {
 Params:
     image = Input binary image of ubyte (0 for background). Agnostic to SliceKind
 */
-auto findContours(InputType)(auto ref InputType image, double level = defaultLevel, bool fullyConnected = true)
+RCArray!Contour findContours(InputType)(auto ref InputType image, double level = defaultLevel, bool fullyConnected = true)
 {
     if (level == -1.0)
         level = _defaultLevel(image);
@@ -26,7 +26,7 @@ auto findContours(InputType)(auto ref InputType image, double level = defaultLev
     auto segments = _get_contour_segments(image.as!double, level, fullyConnected);
     auto contours = _assemble_contours(segments);
 
-    return contours;
+    return contours.move;
 }
 
 private enum defaultLevel = -1.0;
@@ -147,7 +147,7 @@ auto _get_contour_segments(InputType)
     return segments[];
 }
 
-auto _assemble_contours(Tuple!(Point, Point)[] segments){
+auto _assemble_contours(Tuple!(Point, Point)[] segments){ 
     import std.range;
     import std.algorithm.comparison : equal;
 
@@ -251,30 +251,38 @@ auto _assemble_contours(Tuple!(Point, Point)[] segments){
         
     }
 
-    import std.algorithm.sorting;
-    
-    Slice!(RCI!(RCArray!Point), 1LU, Contiguous) cts = uninitRCslice!(RCArray!Point)(contours.length);
+    import std.algorithm.sorting : sort;
+    import std.array : staticArray;
 
+    auto cts = RCArray!Contour(contours.length);
     size_t i;
 
     foreach (k; contours.keys.sort) // TODO: parallelizm here?
     {
-        cts[i++] = rcarray!Point(contours[k][]);
+        auto _c = contours[k][].rcarray!Point;
+        auto len = _c.length;
+        Contour ctr = uninitRCslice!(double)(len, 2);
+        
+        ctr._iterator[0..len*2][] = (cast(double*)_c.ptr)[0..len*2];
+        
+        cts[i++] = ctr;
     }
 
     return cts.move;
 }
 
-auto contours2image(Slice!(RCI!(RCArray!Point), 1LU, Contiguous) contours, size_t rows, size_t cols)
+alias Contour = Slice!(RCI!double, 2LU, Contiguous);
+
+auto contours2image(RCArray!Contour contours, size_t rows, size_t cols)
 {
 
     Slice!(RCI!ubyte, 2LU, Contiguous) cimg = uninitRCslice!ubyte(rows, cols);
     cimg[] = 0;
 
     contours[].each!((cntr){ // TODO: parallelizm here?
-        cntr[].each!((p){
-            cimg[cast(size_t)p.x, cast(size_t)p.y] = 255;
-        });
+        foreach(p; cntr){
+            cimg[cast(size_t)p[0], cast(size_t)p[1]] = 255;
+        }
     });
 
     return cimg.move;
