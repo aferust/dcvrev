@@ -17,6 +17,8 @@ struct Point {
 
 Params:
     image = Input binary image of ubyte (0 for background). Agnostic to SliceKind
+
+Returns RCArray!Slice!(RCI!double, 2LU, Contiguous): a refcounted array of Contours
 */
 RCArray!Contour findContours(InputType)(auto ref InputType image, double level = defaultLevel, bool fullyConnected = true)
 {
