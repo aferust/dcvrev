@@ -2,6 +2,7 @@ module dcv.measure.contours;
 
 import std.typecons: Tuple, tuple;
 import std.container.dlist: DList;
+import std.math;
 import core.lifetime: move;
 
 import mir.ndslice;
@@ -12,6 +13,15 @@ import mir.rc;
 struct Point {
     double x, y;
 }
+
+struct Rectangle {
+    int x;
+    int y;
+    int width;
+    int height;
+}
+
+alias BoundingBox = Rectangle;
 
 /** Find iso-valued contours in a 2D array for a given level value.
 
@@ -254,12 +264,11 @@ auto _assemble_contours(Tuple!(Point, Point)[] segments){
     }
 
     import std.algorithm.sorting : sort;
-    import std.array : staticArray;
 
     auto cts = RCArray!Contour(contours.length);
     size_t i;
 
-    foreach (k; contours.keys.sort) // TODO: parallelizm here?
+    foreach (k; contours.keys.sort)
     {
         auto _c = contours[k][].rcarray!Point;
         auto len = _c.length;
@@ -288,4 +297,66 @@ auto contours2image(RCArray!Contour contours, size_t rows, size_t cols)
     });
 
     return cimg.move;
+}
+
+double contourArea(C)(auto ref C contour) @nogc nothrow
+{
+    
+    auto xx = contour[0..$, 0];
+    auto yy = contour[0..$, 1];
+
+    immutable npoints = contour.shape[0];
+    
+    double area = 0.0;
+    
+    foreach(i; 0..npoints){
+        auto j = (i + 1) % npoints;
+        area += xx[i] * yy[j];
+        area -= xx[j] * yy[i];
+    }
+    area = abs(area) / 2.0;
+    return area;
+}
+
+double arcLength(C)(auto ref C contour) @nogc nothrow
+{
+    auto xx = contour[0..$, 0];
+    auto yy = contour[0..$, 1];
+    
+    double perimeter = 0.0, xDiff = 0.0, yDiff = 0.0;
+    for( auto k = 0; k < xx.length-1; k++ ) {
+        xDiff = xx[k+1] - xx[k];
+        yDiff = yy[k+1] - yy[k];
+        perimeter += pow( xDiff*xDiff + yDiff*yDiff, 0.5 );
+    }
+    xDiff = xx[xx.length-1] - xx[0];
+    yDiff = yy[yy.length-1] - yy[0];
+    perimeter += pow( xDiff*xDiff + yDiff*yDiff, 0.5 );
+    
+    return perimeter;
+}
+
+auto colMax(S)(ref S x, size_t i) @nogc nothrow
+{
+    return x[x[0..$, i].maxIndex[0], i];
+}
+
+auto colMin(S)(ref S x, size_t i) @nogc nothrow
+{
+    return x[x[0..$, i].minIndex[0], i];
+}
+
+BoundingBox boundingBox(C)(C contour) @nogc nothrow
+{
+    import std.math;
+
+    auto xMax = cast(size_t)contour.colMax(0).round;
+    auto yMax = cast(size_t)contour.colMax(1).round;
+
+    auto xMin = cast(size_t)contour.colMin(0).round;
+    auto yMin = cast(size_t)contour.colMin(1).round;
+
+    return BoundingBox(xMin, yMin, xMax - xMin + 1, yMax - yMin + 1);
+
+
 }

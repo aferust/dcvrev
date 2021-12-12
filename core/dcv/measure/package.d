@@ -1,17 +1,14 @@
 module dcv.measure;
 
 /**
- * Image processing module.
- * 
- * Implements various image processing tools.
- * 
- * v0.1 norm:
- * ???
+ * Measure module
  */
 
 public
 {
     import dcv.measure.label;
     import dcv.measure.contours;
-
+    import dcv.measure.moments;
+    import dcv.measure.ellipse;
+    import dcv.measure.convexhull;
 }
