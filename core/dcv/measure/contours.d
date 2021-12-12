@@ -15,10 +15,10 @@ struct Point {
 }
 
 struct Rectangle {
-    int x;
-    int y;
-    int width;
-    int height;
+    size_t x;
+    size_t y;
+    size_t width;
+    size_t height;
 }
 
 alias BoundingBox = Rectangle;
