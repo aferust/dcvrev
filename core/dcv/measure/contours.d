@@ -336,12 +336,12 @@ double arcLength(C)(auto ref C contour) @nogc nothrow
     return perimeter;
 }
 
-auto colMax(S)(ref S x, size_t i) @nogc nothrow
+auto colMax(S)(auto ref S x, size_t i) @nogc nothrow
 {
     return x[x[0..$, i].maxIndex[0], i];
 }
 
-auto colMin(S)(ref S x, size_t i) @nogc nothrow
+auto colMin(S)(auto ref S x, size_t i) @nogc nothrow
 {
     return x[x[0..$, i].minIndex[0], i];
 }
