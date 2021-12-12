@@ -17,6 +17,7 @@
 * Otsu's method for threshold calculation
 * dcv.measure.label for labelling connected regions
 * dcv.measure.contours
+* moments, ellipsefit, convexhull, area, perimeter
 
 ## Need help for
 
