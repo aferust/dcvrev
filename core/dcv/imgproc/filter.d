@@ -1185,7 +1185,7 @@ Slice!(T*, 2LU, kind) open(alias BoundaryConditionTest = neumann, T, SliceKind k
 {
     return morphOp!(MorphologicOperation.DILATE, BoundaryConditionTest)(
         morphOp!(MorphologicOperation.ERODE, BoundaryConditionTest)(slice,
-        kernel, emptySlice!([2], T), pool), kernel, prealloc, pool);
+        kernel, emptySlice!(2, T), pool), kernel, prealloc, pool);
 }
 
 /**

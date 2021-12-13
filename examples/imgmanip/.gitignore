@@ -1,0 +1,8 @@
+.dub
+docs.json
+__dummy.html
+*.o
+*.obj
+*.selections.json
+/imgmanip
+/dcv_imgmanip
