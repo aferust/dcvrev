@@ -15,11 +15,6 @@
     "license": "BSL-1.0",
 
     "targetType": "none",
-    "versions": [
-        "GLFW_31",
-        "GL_11",
-        "GL_AllowDeprecated"
-    ],
     "subPackages": [
 
         {
@@ -33,7 +28,12 @@
                 "imageformats": "7.0.2",
                 "bindbc-glfw": "~>1.0.0",
                 "bindbc-opengl": "~>1.0.0"
-            }
+            },
+            "versions": [
+                "GLFW_31",
+                "GL_11",
+                "GL_AllowDeprecated"
+            ]
         },
         {
             "name": "ffmpeg441",
