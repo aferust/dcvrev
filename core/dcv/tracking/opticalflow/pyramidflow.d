@@ -317,7 +317,7 @@ version (unittest)
 
     class DummyDenseFlow : DenseOpticalFlow
     {
-        override DenseFlow evaluate(inout Image f1, inout Image f2, DenseFlow prealloc = emptySlice!([3],
+        override DenseFlow evaluate(inout Image f1, inout Image f2, DenseFlow prealloc = emptySlice!(3,
                 float), bool usePrevious = false)
         {
             return new float[f1.height * f1.width * 2].sliced(f1.height, f1.width, 2);

@@ -52,7 +52,7 @@ Returns:
 pure nothrow
 auto extractCorners(T)
 (
-    Slice!(Contiguous, [2], T*) cornerResponse,
+    Slice!(T*, 2, Contiguous) cornerResponse,
     int count = -1,
     T threshold = 0
 ) if ( isNumeric!T )

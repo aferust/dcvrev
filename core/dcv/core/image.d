@@ -5,7 +5,7 @@ For any image processing needs, image data can be sliced to mir.ndslice.slice.Sl
 Example:
 ----
 Image image = new Image(32, 32, ImageFormat.IF_MONO, BitDepth.BD_32);
-Slice!(Contiguous, [3], float*) slice = image.sliced!float; // slice image data, considering the data is of float type.
+Slice!(float*, 3, Contiguous) slice = image.sliced!float; // slice image data, considering the data is of float type.
 assert(image.height == slice.length!0 && image.width == slice.length!1);
 assert(image.channels == 1);
 image = slice.asImage(ImageFormat.IF_MONO); // create the image back from sliced data.

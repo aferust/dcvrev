@@ -30,22 +30,19 @@ package(dcv) @nogc pure nothrow
     {
         //enum N = packs[0];
         size_t[N-1] shape = slice.shape[0 .. N-1];
-        //ptrdiff_t[N-1] strides = [slice.strides[0] / CH, slice.strides[1] / CH];
         T[CH]* ptr = cast(T[CH]*)slice._iterator;
         alias Ret = Slice!(T[CH]*, N-1, kind);
-        return Ret(shape,  ptr/*, strides[0 .. Ret.init._strides.length]*/);
+        return Ret(shape,  ptr);
     }
 
     /// ditto
     auto staticUnpack(size_t CH, SliceKind kind, size_t N, T)(Slice!(T[CH]*, N, kind) slice)
         if (N == 2LU)
     {
-        //enum N = packs[0];
         size_t[N+1] shape = [slice.shape[0], slice.shape[1], CH];
-        //ptrdiff_t[N+1] strides = [slice.strides[0] * CH, slice.strides[1] * CH, 1];
         T* ptr = cast(T*)slice._iterator;
         alias Ret = Slice!(T*, N+1, kind);
-        return Ret(shape, /*strides[0 .. Ret.init._strides.length],*/ ptr);
+        return Ret(shape, ptr);
     }
 
     @safe @nogc nothrow pure auto borders(Shape)(Shape shape, size_t ks)
@@ -124,19 +121,19 @@ static if (__VERSION__ >= 2071)
     /**
      * Merge multiple slices into one.
      * 
-     * By input of multiple Slice!(kind, [N], T*) objects, produces one Slice!(kind, [N+1], T*)
+     * By input of multiple Slice!(T*, N, kind) objects, produces one Slice!(T*, N+1, kind)
      * object, where length of last dimension is number of input slices. Values
      * of input slices' elements are copied to resulting slice, where [..., i] element
      * of j-th input slice is copied to [..., i, j] element of output slice.
      * 
-     * e.g. If three single channel images (Slice!(kind, [2], Iterator)) are merged, output will be 
-     * a three channel image (Slice!(kind, [3], Iterator)).
+     * e.g. If three single channel images (Slice!(Iterator, 2, kind)) are merged, output will be 
+     * a three channel image (Slice!(Iterator, 3, kind)).
      * 
      * Params:
      * slices = Input slices. All must by Slice object with same input template parameters.
      * 
      * Returns:
-     * For input of n Slice!(Contiguous, [N], T*) objects, outputs Slice!(kind, [N+1], T*) object, where 
+     * For input of n Slice!(T*, N, Contiguous) objects, outputs Slice!(T*, N+1, kind) object, where 
      * last dimension size is n.
      */
     pure auto merge(Slices...)(Slices slices)
@@ -151,7 +148,7 @@ static if (__VERSION__ >= 2071)
         immutable D = slices[0].shape.length;
         const auto length = slices[0].elementCount;
 
-        auto data = makeUninitSlice!(T)(GCAllocator.instance, length * slices.length); //uninitializedArray!(T[])(length * slices.length);
+        auto data = makeUninitSlice!(T)(GCAllocator.instance, length * slices.length);
         
         ElementRange[slices.length] elRange;
 

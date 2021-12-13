@@ -43,7 +43,7 @@ Slice!(OutputType*, 2LU, SliceKind.contiguous) harrisCorners(InputType, OutputTy
     in uint winSize = 3,
     in float k = 0.64f,
     in float gauss = 0.84f,
-    Slice!(OutputType*, 2LU, SliceKind.contiguous) prealloc = emptySlice!([2], OutputType),
+    Slice!(OutputType*, 2LU, SliceKind.contiguous) prealloc = emptySlice!(2, OutputType),
     TaskPool pool = taskPool
 )
 in
@@ -84,7 +84,7 @@ Slice!(OutputType*, 2LU, SliceKind.contiguous) shiTomasiCorners(InputType, Outpu
     Slice!(InputType*, 2LU, inputKind) image,
     in uint winSize = 3,
     in float gauss = 0.84f,
-    Slice!(OutputType*, 2LU, SliceKind.contiguous) prealloc = emptySlice!([2], OutputType),
+    Slice!(OutputType*, 2LU, SliceKind.contiguous) prealloc = emptySlice!(2, OutputType),
     TaskPool pool = taskPool
 )
 in
@@ -207,7 +207,7 @@ Slice!(OutputType*, 2LU, SliceKind.contiguous) calcCorners(Detector, InputType, 
 
     // TODO: implement gaussian weighting!
 
-    Slice!(SliceKind.contiguous, [2], InputType*) fx, fy;
+    Slice!(InputType*, 2, SliceKind.contiguous) fx, fy;
     calcPartialDerivatives(image, fx, fy);
 
     auto windowPack = zip(prealloc, fx, fy).windows(winSize, winSize);

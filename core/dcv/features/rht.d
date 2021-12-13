@@ -369,7 +369,7 @@ struct RhtEllipses
                 toInt(c.b / _axisTol), toInt(c.phi / _phiTol));
     }
 
-    auto fitCurve(Range, SliceKind kind, Sample)(Slice!(kind, [2], Range) image, Sample sample)
+    auto fitCurve(Range, SliceKind kind, Sample)(Slice!(Range, 2, kind) image, Sample sample)
     {
         Curve c;
         //TODO:

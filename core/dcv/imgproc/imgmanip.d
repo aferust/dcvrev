@@ -348,7 +348,6 @@ private enum TransformType : size_t
 
 private static bool isTransformMatrix(TransformMatrix)()
 {
-    // static if its float[][], or its Slice!(SliceKind.contiguous, [2], float*)
     import std.traits : isScalarType, isPointer, TemplateArgsOf, PointerTarget;
 
     static if (isArray!TransformMatrix)
@@ -363,7 +362,7 @@ private static bool isTransformMatrix(TransformMatrix)()
     else static if (isSlice!TransformMatrix)
     {
         static if (kindOf!TransformMatrix == SliceKind.contiguous &&
-                TemplateArgsOf!(TransformMatrix)[1] == [2] &&
+                TemplateArgsOf!(TransformMatrix)[1] == 2 &&
                 isFloatingPoint!(DeepElementType!TransformMatrix))
             return true;
         else
@@ -381,18 +380,18 @@ unittest
     static assert(isTransformMatrix!(double[][]));
     static assert(isTransformMatrix!(real[][]));
     static assert(isTransformMatrix!(real[3][3]));
-    static assert(isTransformMatrix!(Slice!(SliceKind.contiguous, [2], float*)));
-    static assert(isTransformMatrix!(Slice!(SliceKind.contiguous, [2], double*)));
-    static assert(isTransformMatrix!(Slice!(SliceKind.contiguous, [2], real*)));
+    static assert(isTransformMatrix!(Slice!(float*, 2, SliceKind.contiguous)));
+    static assert(isTransformMatrix!(Slice!(double*, 2, SliceKind.contiguous)));
+    static assert(isTransformMatrix!(Slice!(real*, 2, SliceKind.contiguous)));
 
-    static assert(!isTransformMatrix!(Slice!(SliceKind.universal, [2], real*)));
-    static assert(!isTransformMatrix!(Slice!(SliceKind.canonical, [2], real*)));
+    static assert(!isTransformMatrix!(Slice!(real*, 2, SliceKind.universal)));
+    static assert(!isTransformMatrix!(Slice!(real*, 2, SliceKind.canonical)));
 
     static assert(!isTransformMatrix!(int[][]));
     static assert(!isTransformMatrix!(real[]));
     static assert(!isTransformMatrix!(real[][][]));
-    static assert(!isTransformMatrix!(Slice!(SliceKind.contiguous, [2], int*)));
-    static assert(!isTransformMatrix!(Slice!(SliceKind.contiguous, [1], float*)));
+    static assert(!isTransformMatrix!(Slice!(int*, 2, SliceKind.contiguous)));
+    static assert(!isTransformMatrix!(Slice!(float*, 1, SliceKind.contiguous)));
 }
 
 /**
