@@ -1,8 +1,5 @@
 module dcv.measure.convexhull;
 
-/* https://rosettacode.org/wiki/Convex_hull 
-   https://www.gnu.org/licenses/fdl-1.2.html
-*/
 import std.math;
 
 import mir.ndslice.sorting: sort;
@@ -10,60 +7,88 @@ import mir.ndslice;
 import mir.rc;
 import mir.appender;
 
-struct Coord {
-    size_t x, y;
+/** return indices of convex hull or points based on the template param of indices_only = true/false
+Params:
+    points = n x 2 points (Slice).
 
-    int opCmp(Coord rhs) @nogc nothrow {
-        if (x < rhs.x) return -1;
-        if (rhs.x < x) return 1;
-        return 0;
-    }
-}
+*/
+auto convexHull(alias indices_only = true, PTSlice)(PTSlice points) @nogc nothrow {
 
-auto convexHull(C)(C contour) @nogc nothrow
-{
     //assert( n >= 3, "Convex hull not possible");
+    
+    import std.range: chain;
 
-    const n = contour.shape[0];
+    const n = points.length!0;
 
+    struct Coord {
+        double x, y;
+
+        size_t index;
+
+        int opCmp(Coord rhs) @nogc nothrow {
+            if (x < rhs.x) return -1;
+            if (rhs.x < x) return 1;
+            return 0;
+        }
+    }
     auto _p = RCArray!Coord(n);
     
     foreach(i; 0..n)
-        _p[i] = Coord(cast(size_t)contour[i, 0].round, cast(size_t)contour[i, 1].round);
+        _p[i] = Coord(cast(double)points[i, 0], cast(double)points[i, 1], i);
     
-    auto p = sort(_p[]);
-
-    auto h = scopedBuffer!Coord;
- 
-    // lower hull
-    foreach (pt; p) {
-        while (h.length >= 2 && !ccw(h.data[$-2], h.data[$-1], pt)) {
-            h.popBackN(1);
+    
+    import std.algorithm.sorting : ssort = sort;
+    auto p = _p[].ssort;
+    
+    auto upper_pts = scopedBuffer!Coord;
+	upper_pts.put(p[0]); upper_pts.put(p[1]);
+	
+    foreach (i; 2..n){
+		upper_pts.put(p[i]);
+		while ((upper_pts.length > 2) && 
+            !rightTurn(upper_pts.data[$ - 1], upper_pts.data[$ - 2], upper_pts.data[$ - 3])){
+			Coord tmp = upper_pts.data[$-1];
+            upper_pts.popBackN(2);
+            upper_pts.put(tmp);
         }
-        h.put(pt);
     }
- 
-    // upper hull
-    const t = h.length + 1;
-    foreach_reverse (i; 0..(p.length - 1)) {
-        auto pt = p[i];
-        while (h.length >= t && !ccw(h.data[$-2], h.data[$-1], pt)) {
-            h.popBackN(1);
+    
+	auto lower_pts = scopedBuffer!Coord;
+    lower_pts.put(p[$ - 1]); lower_pts.put(p[$ - 2]);
+	
+    foreach_reverse (i; 0..(n - 2)){
+		lower_pts.put(p[i]);
+		while ((lower_pts.length > 2) && !rightTurn(lower_pts.data[$ - 1], lower_pts.data[$ - 2], lower_pts.data[$ - 3])){
+			Coord tmp = lower_pts.data[$-1];
+            lower_pts.popBackN(2);
+            lower_pts.put(tmp);
         }
-        h.put(pt);
     }
- 
-    h.popBackN(1);
     
-    Slice!(RCI!size_t, 2LU, Contiguous) hull = uninitRCslice!(size_t)(h.length, 2);
-    
-    hull._iterator[0..h.length*2][] = (cast(size_t*)h.data[].rcarray.ptr)[0..h.length*2];
+	auto lower = lower_pts.data[1 .. $-1];
 
-    return hull;
+    static if(indices_only){
+        RCArray!size_t hull_indices = RCArray!size_t(lower.length + upper_pts.length); // returning indices are of size_t
+        size_t i;
+        foreach (hp; chain(upper_pts.data[], lower))
+            hull_indices[i++] = hp.index;
+        return hull_indices;
+    } else {
+        Slice!(RCI!double, 2LU, Contiguous) hullpoints = uninitRCslice!(double)(lower.length + upper_pts.length, 2);
+        size_t i;
+        foreach (hp; chain(upper_pts.data[], lower))
+        {
+            hullpoints[i, 0] = hp.x;
+            hullpoints[i, 1] = hp.y;
+            ++i;
+        }
+        return hullpoints; // returning coords are of double
+    }
 }
- 
-/* ccw returns true if the three points make a counter-clockwise turn */
+
 pragma(inline, true)
-private auto ccw(Coord a, Coord b, Coord c) @nogc nothrow {
-    return ((b.x - a.x) * (c.y - a.y)) > ((b.y - a.y) * (c.x - a.x));
-}
+private bool rightTurn(PC)(PC p1, PC p2, PC p3) {
+	if ((p3.y-p1.y)*(p2.x-p1.x) >= (p2.y-p1.y)*(p3.x-p1.x))
+        return false;
+	return true;
+}	
