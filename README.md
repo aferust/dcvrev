@@ -69,8 +69,9 @@ Library is licensed under Boost Software License - Version 1.0. Some modules in 
 
 ## newly-implemented functionality:
 * Otsu's method for threshold calculation
-* dcv.measure.label for labelling connected regions
-* dcv.measure module with refcounted image types: moments, ellipsefit, convexhull, findContours, area, perimeter
+* dcv.measure module with refcounted image types: labelling connected regions, moments, ellipsefit, convexhull, findContours, area, perimeter
+* Switched to modern OpenGL for rendering, by reserving the legacy gl support. use "subConfigurations": {"dcv:core": "legacygl"} for the legacy GL support.
+* New plot primitives like drawLine and drawCircle at Opengl rendering level. the function plot2imslice copies the rendered buffer to a slice. Take a look at the convexhull examples for more.
 
 ## Need help for
 * testing.

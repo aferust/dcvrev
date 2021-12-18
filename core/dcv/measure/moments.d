@@ -1,3 +1,7 @@
+/*
+Copyright (c) 2021- Ferhat Kurtulmuş
+Boost Software License - Version 1.0 - August 17th, 2003
+*/
 module dcv.measure.moments;
 
 import dcv.measure.contours;

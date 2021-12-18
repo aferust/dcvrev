@@ -827,6 +827,22 @@ version(UseLegacyGL){ } else {
             new LineDrawer(p1, p2, color, lineWidth)
         );
     }
+    
+    /** 
+        copy rendered figure to a slice. Useful with plot primitives.
+    */
+    auto plot2imslice(){
+        import mir.rc;
+
+        glfwMakeContextCurrent(_glfwWindow);
+        
+        Slice!(RCI!ubyte, 3LU, Contiguous) imgslice = uninitRCslice!ubyte(width, height, 3);
+        imgslice[] = 0;
+
+	    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, imgslice.ptr);
+
+        return imgslice;
+    }
 
 }
     
