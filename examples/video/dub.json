@@ -6,5 +6,8 @@
 	"dependencies": {
 		"dcv:core": {"path": "../../"},
         "dcv:video": {"path": "../../"}
-	}
+	},
+    "subConfigurations": {
+        "dcv:core": "legacygl"
+    }
 }

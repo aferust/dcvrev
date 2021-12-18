@@ -27,12 +27,26 @@
                 "mir-random": "2.2.19",
                 "imageformats": "7.0.2",
                 "bindbc-glfw": "~>1.0.0",
-                "bindbc-opengl": "~>1.0.0"
+                "bindbc-opengl": "~>1.0.0",
+                "dvector": "0.0.5",
+                "bettercmath": "*"
             },
-            "versions": [
-                "GLFW_31",
-                "GL_11",
-                "GL_AllowDeprecated"
+            "versions": ["GLFW_31"],
+            "configurations": [
+                {
+                    "name": "default",
+                    "versions": [
+                        "GL_31"
+                    ]
+                },
+                {
+                    "name": "legacygl",
+                    "versions": [
+                        "GL_11",
+                        "GL_AllowDeprecated",
+                        "UseLegacyGL"
+                    ]
+                }
             ]
         },
         {

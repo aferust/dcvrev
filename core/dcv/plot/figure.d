@@ -102,8 +102,11 @@ module dcv.plot.figure;
 import std.string : toStringz;
 import std.exception;
 import std.conv : to;
+import std.container : SList;
 
 import mir.ndslice.slice;
+
+import dcv.plot.drawprimitives;
 
 version(ggplotd)
 {
@@ -320,6 +323,10 @@ int waitKey(string unit = "msecs")(ulong count = 0)
     _lastKey = -1;
     auto hiddenLoopCheck = 0;
 
+version(UseLegacyGL){ } else {
+    foreach (f; _figures)
+        f.prepareRender();
+}
     while (true)
     {
         if (count && count < mixin("stopwatch.peek.total!\"" ~ unit ~ "\""))
@@ -369,7 +376,7 @@ int waitKey(string unit = "msecs")(ulong count = 0)
                 break;
         }
     }
-
+    
     return 0;
 }
 
@@ -457,6 +464,11 @@ class Figure
         MouseCallback _mouseCallback = null;
         CursorCallback _cursorCallback = null;
         CloseCallback _closeCallback = null;
+
+        version(UseLegacyGL){ } else {
+            TextureDrawer imageRenderer = null;
+            SList!PrimitiveDrawer primitiveStack;
+        }
     }
 
     @disable this();
@@ -490,7 +502,7 @@ class Figure
 
         setupWindow();
         fitWindow();
-
+        
         setupCallbacks();
     }
 
@@ -521,6 +533,10 @@ class Figure
         if (_glfwWindow !is null)
         {
             glfwDestroyWindow(_glfwWindow);
+        }
+
+        version(UseLegacyGL){} else {
+            clearPrimitives();
         }
     }
 
@@ -607,6 +623,10 @@ class Figure
     {
         if (_glfwWindow)
             glfwShowWindow(_glfwWindow);
+        
+        version(UseLegacyGL){} else {
+            clearPrimitives();
+        }
     }
 
     /// Show the figure window.
@@ -715,34 +735,101 @@ class Figure
 
     private void render()
     {
-        glfwMakeContextCurrent(_glfwWindow);
+        version(UseLegacyGL){
+            glfwMakeContextCurrent(_glfwWindow);
 
-        int fBufWidth, fBufHeight;
-        glfwGetFramebufferSize(_glfwWindow, &fBufWidth, &fBufHeight);
+            int fBufWidth, fBufHeight;
+            glfwGetFramebufferSize(_glfwWindow, &fBufWidth, &fBufHeight);
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glDisable(GL_DEPTH_TEST);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glDisable(GL_DEPTH_TEST);
 
-        glViewport(0, 0, fBufWidth, fBufHeight);
+            glViewport(0, 0, fBufWidth, fBufHeight);
 
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
 
-        glOrtho(0, width, 0, height, 0.1, 1);
+            glOrtho(0, width, 0, height, 0.1, 1);
 
-        glPixelZoom(fBufWidth / width, -fBufHeight / height);
+            glPixelZoom(fBufWidth / width, -fBufHeight / height);
 
-        glRasterPos3f(0, height - 1, -0.3);
+            glRasterPos3f(0, height - 1, -0.3);
 
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        glDrawPixels(_width, _height, GL_RGB, GL_UNSIGNED_BYTE, _data.ptr);
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+            glDrawPixels(_width, _height, GL_RGB, GL_UNSIGNED_BYTE, _data.ptr);
 
-        glFlush();
-        glEnable(GL_DEPTH_TEST);
+            glFlush();
+            glEnable(GL_DEPTH_TEST);
 
-        glfwSwapBuffers(_glfwWindow);
+            glfwSwapBuffers(_glfwWindow);
+
+        } else {
+
+            glfwMakeContextCurrent(_glfwWindow);
+
+            int fBufWidth, fBufHeight;
+            glfwGetFramebufferSize(_glfwWindow, &fBufWidth, &fBufHeight);
+            glViewport(0, 0, width, height);
+
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+            glClearColor(0.5f, 0.0f, 0.5f, 1.0f);
+
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            imageRenderer.render();
+
+            drawPrimitives();
+        
+            glfwSwapBuffers(_glfwWindow);
+        }
     }
 
+version(UseLegacyGL){ } else {
+
+    private void prepareRender(){
+        glfwMakeContextCurrent(_glfwWindow);
+        if(imageRenderer is null){ // todo: singleton
+            ortho = Mat4.ortho(0.0f, cast(float)height, cast(float)width, 0.0f);
+            imageRenderer = new TextureDrawer(_data.ptr, width, height);
+        }
+    }
+
+    private void drawPrimitives(){
+        import std.range;
+
+        auto primRange = primitiveStack[];
+        while(!primRange.empty){
+            primRange.front.draw();
+            primRange.popFrontN(1);
+        }
+    }
+
+    void clearPrimitives(){
+        primitiveStack.clear();
+    }
+
+    void drawCircle(PlotCircle circle, PlotColor color = [1.0f, 0.0f, 0.0f, 0.5f], bool filled = false){
+        //if(filled){
+        //    primitiveStack.insertFront(
+        //        new SolidCircleDrawer(circle, color)
+        //    );
+        //}else{
+            primitiveStack.insertFront(
+                new HollowCircleDrawer(circle, color)
+            );
+        //}
+    }
+
+    void drawLine(PlotPoint p1, PlotPoint p2, PlotColor color, float lineWidth){
+        primitiveStack.insertFront(
+            new LineDrawer(p1, p2, color, lineWidth)
+        );
+    }
+
+}
+    
     private void setupWindow()
     {
         glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
