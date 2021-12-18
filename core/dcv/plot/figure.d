@@ -102,7 +102,7 @@ module dcv.plot.figure;
 import std.string : toStringz;
 import std.exception;
 import std.conv : to;
-import std.container : SList;
+import std.container : DList;
 
 import mir.ndslice.slice;
 
@@ -467,7 +467,7 @@ class Figure
 
         version(UseLegacyGL){ } else {
             TextureDrawer imageRenderer = null;
-            SList!PrimitiveDrawer primitiveStack;
+            DList!PrimitiveDrawer primitiveStack;
         }
     }
 
@@ -801,8 +801,8 @@ version(UseLegacyGL){ } else {
 
         auto primRange = primitiveStack[];
         while(!primRange.empty){
-            primRange.front.draw();
-            primRange.popFrontN(1);
+            primRange.back.draw();
+            primRange.popBackN(1);
         }
     }
 
@@ -811,15 +811,15 @@ version(UseLegacyGL){ } else {
     }
 
     void drawCircle(PlotCircle circle, PlotColor color = [1.0f, 0.0f, 0.0f, 0.5f], bool filled = false){
-        //if(filled){
-        //    primitiveStack.insertFront(
-        //        new SolidCircleDrawer(circle, color)
-        //    );
-        //}else{
+        if(filled){
+            primitiveStack.insertFront(
+                new SolidCircleDrawer(circle, color)
+            );
+        }else{
             primitiveStack.insertFront(
                 new HollowCircleDrawer(circle, color)
             );
-        //}
+        }
     }
 
     void drawLine(PlotPoint p1, PlotPoint p2, PlotColor color, float lineWidth){

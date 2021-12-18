@@ -147,34 +147,28 @@ final class HollowCircleDrawer : PrimitiveDrawer {
         drawer.draw();
     }
 }
-/*
+
 final class SolidCircleDrawer : PrimitiveDrawer {
     PlotCircle circle;
     PlotColor color;
+    GLuint shaderPrg;
+    GLSolidCircle drawer;
 
     enum num_segments = 80;
 
     this(PlotCircle circle, PlotColor color){
         this.circle = circle;
         this.color = color;
+        shaderPrg = loadShaderColor();
+        drawer = GLSolidCircle(shaderPrg);
     }
 
     override void draw(){
-        enum twicePi = 2*PI;
-        
-        glBegin(GL_TRIANGLE_FAN);
-        glColor3f(color[0], color[1], color[2]);
-        glVertex2f(circle.centerx, circle.centery);
-        foreach (i; 0..num_segments){
-            glVertex2f(
-                (circle.centerx + (circle.radius * cos(i * twicePi / cast(float)num_segments))),
-                (circle.centery + (circle.radius * sin(i * twicePi / cast(float)num_segments)))
-            );
-        }
-        glEnd();
+        drawer.set(circle.centerx, circle.centery, circle.radius, color);
+        drawer.draw();
     }
 }
-*/
+
 
 /+++++++++++++++++++++++++++++       shader code        +++++++++++++++++++++++++++++++/
 
@@ -366,7 +360,7 @@ struct GLSolidCircle {
         glBufferData(GL_ARRAY_BUFFER, vertices.length * float.sizeof, vertices[].ptr, GL_STREAM_DRAW);
     }
 
-    void set(int x, int y, float radius, PlotColor color){        
+    void set(float x, float y, float radius, PlotColor color){        
         import std.range : chunks;
 
         enum quality = 0.125;

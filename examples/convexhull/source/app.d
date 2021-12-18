@@ -51,10 +51,6 @@ int main(string[] args)
         // compute point indices of the convex hull
         auto chull_indices = convexHull(points);
 
-        // scatter points of the convex hull on the figure window
-        foreach(index; chull_indices)
-            figure.drawCircle(PlotCircle(cast(float)points[index, 0], cast(float)points[index, 1], 5.0f), plotRed);
-        
         // plot hull lines on the figure
         foreach (i; 0 .. chull_indices.length -1){
             auto p1 = PlotPoint(points[chull_indices[i], 0], points[chull_indices[i], 1]);
@@ -64,6 +60,10 @@ int main(string[] args)
         auto p1 = PlotPoint(points[chull_indices[0], 0], points[chull_indices[0], 1]);
         auto p2 = PlotPoint(points[chull_indices[$-1], 0], points[chull_indices[$-1], 1]);
         figure.drawLine(p1, p2, plotBlue, 3.0f);
+
+        // scatter points of the convex hull on the figure window
+        foreach(index; chull_indices)
+            figure.drawCircle(PlotCircle(cast(float)points[index, 0], cast(float)points[index, 1], 5.0f), plotRed, true);
 
         // rendered plot can be written to a file as image.
         // figure.plot2imslice().imwrite(ImageFormat.IF_RGB, "hull.png");
