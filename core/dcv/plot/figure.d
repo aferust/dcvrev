@@ -466,7 +466,7 @@ class Figure
         CloseCallback _closeCallback = null;
 
         version(UseLegacyGL){ } else {
-            TextureDrawer imageRenderer = null;
+            TextureRenderer imageRenderer = null;
             DList!PrimitiveDrawer primitiveStack;
         }
     }
@@ -793,7 +793,7 @@ version(UseLegacyGL){ } else {
         
         if(imageRenderer is null){
             ortho = Mat4.ortho(0.0f, cast(float)width, cast(float)height, 0.0f);
-            imageRenderer = new TextureDrawer(_data.ptr, width, height);
+            imageRenderer = new TextureRenderer(_data.ptr, width, height);
         }
     }
 

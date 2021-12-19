@@ -40,7 +40,7 @@ struct PlotCircle {
 
 package:
 
-class TextureDrawer {
+class TextureRenderer {
     private {
         ubyte* imptr;
         uint width;
