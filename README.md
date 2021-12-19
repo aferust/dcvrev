@@ -78,4 +78,4 @@ Library is licensed under Boost Software License - Version 1.0. Some modules in 
 * updating unittests.
 * solving any issue encountered during tests.
 * fixing multiview module. Start here: unrevised/multiview/stereo/matching.d line 242
-* re-binding ggplot backend or doing something better
+* re-binding ggplot backend or doing something better (my primitive drawing implementation can be improved)
