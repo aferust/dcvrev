@@ -840,7 +840,7 @@ version(UseLegacyGL){ } else {
         Slice!(RCI!ubyte, 3LU, Contiguous) imgslice = uninitRCslice!ubyte(width, height, 3);
         imgslice[] = 0;
 
-	    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, imgslice.ptr);
+        glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, imgslice.ptr);
 
         return imgslice;
     }
