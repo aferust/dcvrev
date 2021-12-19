@@ -178,7 +178,7 @@ import mir.ndslice;
 import mir.rc;
 
 alias Mat4 = Matrix!(float, 4);
-public __gshared Mat4 ortho;
+__gshared Mat4 ortho;
 
 /+
 auto getOrtho(float left, float right, float bottom, float top, float near = -1, float far = 1)
