@@ -57,7 +57,7 @@ do
 {
     if (prealloc.shape != image.shape)
     {
-        prealloc = uninitializedSlice!OutputType(image.shape);
+        prealloc = makeUninitSlice!OutputType(GCAllocator.instance, image.shape);//uninitializedSlice!OutputType(image.shape);
     }
     HarrisDetector detector;
     detector.k = k;
@@ -153,7 +153,7 @@ unittest
 {
     void calcCornersImpl(Window, Detector)(Window window, Detector detector)
     {
-        import mir.ndslice.algorithm : reduce;
+        import mir.algorithm.iteration : reduce;
 
         float[3] r = [0.0f, 0.0f, 0.0f];
         float winSqr = float(window.length!0);
