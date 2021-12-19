@@ -769,7 +769,7 @@ class Figure
 
             int fBufWidth, fBufHeight;
             glfwGetFramebufferSize(_glfwWindow, &fBufWidth, &fBufHeight);
-            glViewport(0, 0, width, height);
+            glViewport(0, 0, fBufWidth, fBufHeight);
 
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -790,8 +790,9 @@ version(UseLegacyGL){ } else {
 
     private void prepareRender(){
         glfwMakeContextCurrent(_glfwWindow);
-        if(imageRenderer is null){ // todo: singleton
-            ortho = Mat4.ortho(0.0f, cast(float)height, cast(float)width, 0.0f);
+        
+        if(imageRenderer is null){
+            ortho = Mat4.ortho(0.0f, cast(float)width, cast(float)height, 0.0f);
             imageRenderer = new TextureDrawer(_data.ptr, width, height);
         }
     }
