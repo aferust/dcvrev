@@ -132,8 +132,6 @@ final class HollowCircleDrawer : PrimitiveDrawer {
     GLuint shaderPrg;
     GLCircle drawer;
 
-    enum num_segments = 80;
-
     this(PlotCircle circle, PlotColor color){
         this.circle = circle;
         this.color = color;
@@ -153,8 +151,6 @@ final class SolidCircleDrawer : PrimitiveDrawer {
     PlotColor color;
     GLuint shaderPrg;
     GLSolidCircle drawer;
-
-    enum num_segments = 80;
 
     this(PlotCircle circle, PlotColor color){
         this.circle = circle;
