@@ -9,6 +9,8 @@ version(UseLegacyGL){ } else:
 
 import std.math;
 import std.typecons : Tuple;
+
+import mir.appender;
 import bettercmath;
 
 import dcv.plot.bindings;
@@ -172,8 +174,6 @@ import core.stdc.math: cos, sin;
 import core.stdc.stdlib: malloc, free, exit;
 import core.stdc.stdio: printf;
 
-import dvector;
-
 import mir.ndslice;
 import mir.rc;
 
@@ -204,8 +204,8 @@ auto getOrtho(float left, float right, float bottom, float top, float near = -1,
 enum PI = 3.14159265359f;
 
 struct GLLine{
+    float[4] vertices;
     
-    Dvector!float vertices;
     GLuint shaderProgram;
     GLuint vbo;
 
@@ -259,13 +259,13 @@ struct GLLine{
     }
 
     ~this(){
-        vertices.free();
+        
     }
 }
 
 struct GLCircle {
     
-    Dvector!float vertices;
+    ScopedBuffer!float vertices;
     GLuint shaderProgram;
     GLuint vbo;
 
@@ -280,13 +280,13 @@ struct GLCircle {
 
         for (float currAngle = 0.0f; currAngle <= 2.0f * PI; currAngle += increment)
         {
-            vertices ~= 0.0f;
-            vertices ~= 0.0f;
+            vertices.put(0.0f);
+            vertices.put(0.0f);
         }
 
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, vertices.length * float.sizeof, vertices[].ptr, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices.length * float.sizeof, vertices.data.ptr, GL_STATIC_DRAW);
     }
 
     void set(float x, float y, float radius, PlotColor color){
@@ -297,13 +297,13 @@ struct GLCircle {
         size_t i;
         for (float currAngle = 0.0f; currAngle <= 2.0f * PI; currAngle += increment)
         {
-            vertices[i] = radius * cos(currAngle) + float(x);
-            vertices[i+1] = radius * sin(currAngle) + float(y);
+            vertices.data[i] = radius * cos(currAngle) + float(x);
+            vertices.data[i+1] = radius * sin(currAngle) + float(y);
             i += 2;
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, vertices.length * float.sizeof, vertices[].ptr, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices.length * float.sizeof, vertices.data.ptr, GL_STATIC_DRAW);
         
         glUseProgram(shaderProgram);
 
@@ -328,13 +328,14 @@ struct GLCircle {
     }
 
     ~this(){
-        vertices.free();
+        
     }
 }
 
 struct GLSolidCircle {
     
-    Dvector!float vertices;
+    ScopedBuffer!float vertices;
+
     GLuint shaderProgram;
     GLuint vbo;
 
@@ -347,13 +348,13 @@ struct GLSolidCircle {
 	    int triangleAmount = cast(int)(300 * quality);
 
 		foreach(i; 0..triangleAmount) { 
-		    vertices ~= 0; 
-			vertices ~= 0;
+		    vertices.put(0.0f);
+			vertices.put(0.0f);
 		}
 
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, vertices.length * float.sizeof, vertices[].ptr, GL_STREAM_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices.length * float.sizeof, vertices.data.ptr, GL_STREAM_DRAW);
     }
 
     void set(float x, float y, float radius, PlotColor color){        
@@ -363,14 +364,14 @@ struct GLSolidCircle {
 	    int triangleAmount = cast(int)(300 * quality);
         
         int i;
-        foreach(ref c; chunks(vertices[], 2)) {
+        foreach(ref c; chunks(vertices.data[], 2)) {
 		    c[0] = x + (radius * cos(i *  2*PI / float(triangleAmount))); 
             c[1] = y + (radius * sin(i * 2*PI / float(triangleAmount)));
             ++i;
 		}
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, vertices.length * float.sizeof, vertices[].ptr, GL_STREAM_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices.length * float.sizeof, vertices.data.ptr, GL_STREAM_DRAW);
 
         glUseProgram(shaderProgram);
 
@@ -394,7 +395,7 @@ struct GLSolidCircle {
     }
 
     ~this(){
-        vertices.free();
+        
     }
 }
 
