@@ -532,14 +532,14 @@ GLuint initShader(const char* vShader, const char* fShader, const char* outputAt
 }
 
 
-enum verth = "#version 410 core\n
+enum verth = "#version 140\n
 ";
-enum fragh = "#version 410 core\n";
+enum fragh = "#version 140\n";
 
 
 GLuint loadShaderColor(){
     enum vert = verth ~ q{
-        layout (location = 0) in vec4 position;
+        in vec4 position;
         uniform mat4 projectionMat;
         void main() {
             gl_Position = projectionMat * vec4(position.xyz, 1.0);
@@ -559,7 +559,7 @@ GLuint loadShaderColor(){
 
 GLuint loadShaderTextured(){
     enum vert = verth ~ q{
-        layout (location = 0) in vec4 vertex;
+        in vec4 vertex;
         out vec2 TexCoords;
 
         uniform mat4 projectionMat;
