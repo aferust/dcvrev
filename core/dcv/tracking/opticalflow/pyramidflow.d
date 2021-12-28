@@ -297,6 +297,7 @@ version (unittest)
     import std.algorithm.iteration : map;
     import std.array : array;
     import std.random : uniform;
+    import mir.ndslice.slice;
 
     private auto createImage()
     {

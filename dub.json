@@ -46,7 +46,14 @@
                         "UseLegacyGL"
                     ]
                 }
-            ]
+            ],
+            "buildTypes": 
+            {
+                "unittest-release": 
+                {
+                    "buildOptions": ["unittests", "optimize", "inline"]
+                }
+            }
         },
         {
             "name": "ffmpeg441",

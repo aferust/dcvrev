@@ -34,8 +34,8 @@ version (unittest)
     import std.path : extension;
     import std.file : dirEntries, SpanMode, remove;
 
-    alias imgen_8 = pipe!(iota, map!(v => cast(ubyte)uniform(0, ubyte.max)), std.array.array);
-    alias imgen_16 = pipe!(iota, map!(v => cast(ushort)uniform(0, ushort.max)), std.array.array);
+    alias imgen_8 = pipe!(iota, map!(v => cast(ubyte)uniform(0, ubyte.max)), array);
+    alias imgen_16 = pipe!(iota, map!(v => cast(ushort)uniform(0, ushort.max)), array);
 
     auto im_ubyte_8_mono()
     {
@@ -248,7 +248,7 @@ unittest
         remove(f);
         remove(fs);
     }
-    catch
+    catch(Exception e)
     {
     }
 }
@@ -289,7 +289,7 @@ unittest
         remove(f);
         remove(fs);
     }
-    catch
+    catch(Exception e)
     {
     }
 }
@@ -331,7 +331,7 @@ unittest
         remove(f);
         remove(fs);
     }
-    catch
+    catch(Exception e)
     {
     }
 }
@@ -422,10 +422,6 @@ unittest
     {
         // should enter here...
     }
-    catch
-    {
-        assert(0);
-    }
 }
 
 int imreadImpl_imageformats_adoptFormat(ImageFormat format)
@@ -466,9 +462,5 @@ unittest
     catch (Exception e)
     {
         // should enter here...
-    }
-    catch
-    {
-        assert(0);
     }
 }

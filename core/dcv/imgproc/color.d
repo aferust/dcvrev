@@ -244,9 +244,9 @@ unittest
     {
         import std.algorithm.comparison : equal;
         import std.array : array;
-        import std.math : approxEqual;
+        import std.math.operations : isClose;
 
-        assert(rgb.sliced(1, 1, 3).rgb2hsv!HSVType.flattened.array.equal!approxEqual(expectedHSV));
+        assert(rgb.sliced(1, 1, 3).rgb2hsv!HSVType.flattened.array.equal!isClose(expectedHSV));
     }
 
     rgb2hsvTest(cast(ubyte[])[255, 0, 0], cast(ushort[])[0, 100, 100]);
@@ -306,9 +306,9 @@ unittest
     {
         import std.algorithm.comparison : equal;
         import std.array : array;
-        import std.math : approxEqual;
+        import std.math.operations : isClose;
 
-        assert(hsv.sliced(1, 1, 3).hsv2rgb!RGBType.flattened.array.equal!approxEqual(expectedRgb));
+        assert(hsv.sliced(1, 1, 3).hsv2rgb!RGBType.flattened.array.equal!isClose(expectedRgb));
     }
 
     import std.random : uniform;
@@ -412,9 +412,9 @@ unittest
     {
         import std.algorithm.comparison : equal;
         import std.array : array;
-        import std.math : approxEqual;
+        import std.math.operations : isClose;
 
-        assert(rgb.sliced(1, 1, 3).rgb2yuv.flattened.array.equal!approxEqual(expectedYuv));
+        assert(rgb.sliced(1, 1, 3).rgb2yuv.flattened.array.equal!isClose(expectedYuv));
     }
 
     rgb2yuvTest(cast(ubyte[])[0, 0, 0], cast(ubyte[])[16, 128, 128]);
@@ -430,9 +430,9 @@ unittest
     {
         import std.algorithm.comparison : equal;
         import std.array : array;
-        import std.math : approxEqual;
+        import std.math.operations : isClose;
 
-        assert(yuv.sliced(1, 1, 3).yuv2rgb.flattened.array.equal!approxEqual(expectedRgb));
+        assert(yuv.sliced(1, 1, 3).yuv2rgb.flattened.array.equal!isClose(expectedRgb));
     }
 
     yuv2rgbTest(cast(ubyte[])[16, 128, 128], cast(ubyte[])[0, 0, 0]);

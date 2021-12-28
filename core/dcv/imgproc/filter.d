@@ -277,12 +277,12 @@ Slice!(T*, 2LU, Contiguous) laplacianOfGaussian(T = double)(T sigma,
 unittest
 {
     import std.algorithm.comparison : equal;
-    import std.math : approxEqual;
+    import std.math.operations : isClose;
 
     auto log = laplacianOfGaussian!float(0.84f, 3, 3);
     auto expected = [0.147722, -0.00865228, 0.147722, -0.00865228,
         -0.556277, -0.00865228, 0.147722, -0.00865228, 0.147722].sliced(3, 3);
-    assert(equal!approxEqual(log.flattened, expected.flattened));
+    assert(equal!isClose(log.flattened, expected.flattened));
 }
 
 enum GradientDirection

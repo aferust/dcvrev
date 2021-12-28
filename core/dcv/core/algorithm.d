@@ -55,16 +55,16 @@ do
 
 nothrow unittest
 {
-    import std.math : approxEqual;
+    import std.math.operations: isClose;
 
     auto t = tensor1();
     auto ts = t.scaled(10.0f, 2.0f);
 
     assert(t.iterator == ts.iterator);
 
-    assert(approxEqual(ts[0], 12.0f));
-    assert(approxEqual(ts[1], 22.0f));
-    assert(approxEqual(ts[2], 32.0f));
+    assert(isClose(ts[0], 12.0f));
+    assert(isClose(ts[1], 22.0f));
+    assert(isClose(ts[2], 32.0f));
 }
 
 /**
@@ -128,7 +128,7 @@ unittest
 
 nothrow unittest
 {
-    import std.math : approxEqual;
+    import std.math.operations: isClose;
 
     import mir.utility;
 
@@ -143,14 +143,14 @@ nothrow unittest
     auto t2r = t2.ranged(smin, smax);
     auto t3r = t3.ranged(smin, smax);
 
-    assert(approxEqual(reduce!min(float.max, t1r), smin));
-    assert(approxEqual(reduce!max(float.min_normal, t1r), smax));
+    assert(isClose(reduce!min(float.max, t1r), smin));
+    assert(isClose(reduce!max(float.min_normal, t1r), smax));
 
-    assert(approxEqual(reduce!min(float.max, t2r), smin));
-    assert(approxEqual(reduce!max(float.min_normal, t2r), smax));
+    assert(isClose(reduce!min(float.max, t2r), smin));
+    assert(isClose(reduce!max(float.min_normal, t2r), smax));
 
-    assert(approxEqual(reduce!min(float.max, t3r), smin));
-    assert(approxEqual(reduce!max(float.min_normal, t3r), smax));
+    assert(isClose(reduce!min(float.max, t3r), smin));
+    assert(isClose(reduce!max(float.min_normal, t3r), smax));
 }
 
 version (unittest)
