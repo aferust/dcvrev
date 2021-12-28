@@ -65,7 +65,6 @@ Library is licensed under Boost Software License - Version 1.0. Some modules in 
 * bindbc libraries (bindbc-glfw and bindbc-opengl) replaced internal bindings for plotting.
 * FFmpeg 4.4.1 binding was created from scratch.
 * dub packaging system was changed to use dcv modules as separate dependecies such as dcv:core, dcv:video, dcv:ffmpeg441
-* I only tested things on Windows.
 
 ## newly-implemented functionality:
 * Otsu's method for threshold calculation
