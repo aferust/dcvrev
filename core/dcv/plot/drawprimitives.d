@@ -11,7 +11,6 @@ import std.math;
 import std.typecons : Tuple;
 
 import mir.appender;
-import bettercmath;
 
 import dcv.plot.bindings;
 
@@ -177,14 +176,14 @@ import core.stdc.stdio: printf;
 import mir.ndslice;
 import mir.rc;
 
-alias Mat4 = Matrix!(float, 4);
-__gshared Mat4 ortho;
+@nogc nothrow:
 
-/+
-auto getOrtho(float left, float right, float bottom, float top, float near = -1, float far = 1)
+package __gshared Slice!(RCI!float, 2LU, Contiguous) ortho;
+
+package auto getOrtho(float left, float right, float bottom, float top, float near = -1, float far = 1)
 {
     Slice!(RCI!float, 2LU, Contiguous) result = uninitRCslice!(float)(4, 4);
-    result[2, 3] = 0;
+    result[] = 0;
 
     result[0, 0] = 2.0 / (right - left);
     result[1, 1] = 2.0 / (top - bottom);
@@ -197,9 +196,28 @@ auto getOrtho(float left, float right, float bottom, float top, float near = -1,
 
     return result;
 }
-+/
 
-@nogc nothrow:
+private auto getModel(const ref Rect r, float angle){
+    float[3] zeroTranslation = [-r.x - r.w*0.5, -r.y - r.h*0.5, 0.0f];
+    Slice!(RCI!float, 2LU, Contiguous) model = uninitRCslice!(float)(4, 4);
+    model[] = 0;
+    model.diagonal[] = 1;
+
+    // zero translation
+    model[$-1][0 .. 3] += zeroTranslation[0 .. 3];
+
+    // rotateZ
+    immutable auto c = cos(angle), s = sin(angle);
+    model[0, 0] = c; model[0, 1] = -s;
+    model[1, 0] = s; model[1, 1] = c;
+
+    // negative zero translation
+    model[$-1][0 .. 3] -= zeroTranslation[0 .. 3];
+    
+    return model;
+}
+
+private:
 
 enum PI = 3.14159265359f;
 
@@ -243,7 +261,7 @@ struct GLLine{
         glVertexAttribPointer(posAttrib, 2, GL_FLOAT, false, cast(uint)vertexSize, null);
 
         auto pmAtt = glGetUniformLocation(shaderProgram, "projectionMat");
-        glUniformMatrix4fv(pmAtt, 1, GL_FALSE, ortho.elements.ptr);
+        glUniformMatrix4fv(pmAtt, 1, GL_FALSE, ortho.ptr);
 
         // set color
         auto cAtt = glGetUniformLocation(shaderProgram, "ucolor");
@@ -313,7 +331,7 @@ struct GLCircle {
         glEnableVertexAttribArray(posAttrib);
 
         auto pmAtt = glGetUniformLocation(shaderProgram, "projectionMat");
-        glUniformMatrix4fv(pmAtt, 1, GL_FALSE, ortho.elements.ptr);
+        glUniformMatrix4fv(pmAtt, 1, GL_FALSE, ortho.ptr);
 
         // set color
         auto cAtt = glGetUniformLocation(shaderProgram, "ucolor");
@@ -380,7 +398,7 @@ struct GLSolidCircle {
         glEnableVertexAttribArray(posAttrib);
 
         auto pmAtt = glGetUniformLocation(shaderProgram, "projectionMat");
-        glUniformMatrix4fv(pmAtt, 1, GL_FALSE, ortho.elements.ptr);
+        glUniformMatrix4fv(pmAtt, 1, GL_FALSE, ortho.ptr);
 
         // set color
         auto cAtt = glGetUniformLocation(shaderProgram, "ucolor");
@@ -436,7 +454,7 @@ struct GLTexturedRect {
             r.x+r.w, r.y,      1.0f, 0.0f
         ];
 
-        
+        /*
         alias Transform3D = Transform!(float, 3);
         alias Vec3 = Vector!(float, 3);
 
@@ -446,6 +464,8 @@ struct GLTexturedRect {
             .translate(zeroTranslation)
             .rotateZ(angle)
             .translate(-zeroTranslation);
+        */
+        auto model = getModel(r, angle);
         
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, vertices.length * float.sizeof, vertices.ptr, GL_STATIC_DRAW);
@@ -457,9 +477,9 @@ struct GLTexturedRect {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glUseProgram(shaderProgram);
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionMat"), 1, GL_FALSE, ortho.elements.ptr);
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projectionMat"), 1, GL_FALSE, ortho.ptr);
         glUniform1i(glGetUniformLocation(shaderProgram, "userTexture"), 0);
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMat"), 1, GL_FALSE, model.elements.ptr);
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelMat"), 1, GL_FALSE, model.ptr);
 
         glBindVertexArray(0);
     }

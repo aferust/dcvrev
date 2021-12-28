@@ -792,7 +792,7 @@ version(UseLegacyGL){ } else {
         glfwMakeContextCurrent(_glfwWindow);
         
         if(imageRenderer is null){
-            ortho = Mat4.ortho(0.0f, cast(float)width, cast(float)height, 0.0f);
+            ortho = getOrtho(0.0f, cast(float)width, cast(float)height, 0.0f);
             imageRenderer = new TextureRenderer(_data.ptr, width, height);
         }
     }
