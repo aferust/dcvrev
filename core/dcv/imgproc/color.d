@@ -245,8 +245,15 @@ unittest
         import std.algorithm.comparison : equal;
         import std.array : array;
         import std.math.operations : isClose;
+        import std.traits : isIntegral;
 
-        assert(rgb.sliced(1, 1, 3).rgb2hsv!HSVType.flattened.array.equal!isClose(expectedHSV));
+        alias T = DeepElementType!(typeof(expectedHSV));
+        static if(isIntegral!T){
+            assert(rgb.sliced(1, 1, 3).rgb2hsv!HSVType.flattened.array.equal!isClose(expectedHSV));
+        }else{
+            assert(rgb.sliced(1, 1, 3).rgb2hsv!HSVType.flattened.array.isClose(expectedHSV, 0.005));
+        }
+        
     }
 
     rgb2hsvTest(cast(ubyte[])[255, 0, 0], cast(ushort[])[0, 100, 100]);
@@ -304,11 +311,11 @@ unittest
     // value comparison based on results from http://www.rapidtables.com/convert/color/hsv-to-rgb.htm
     auto hsv2rgbTest(HSVType, RGBType)(HSVType[] hsv, RGBType[] expectedRgb)
     {
-        import std.algorithm.comparison : equal;
+        import std.math.operations: isClose;
         import std.array : array;
-        import std.math.operations : isClose;
+        
+        assert(isClose(expectedRgb, hsv.sliced(1, 1, 3).hsv2rgb!RGBType.flattened.array));
 
-        assert(hsv.sliced(1, 1, 3).hsv2rgb!RGBType.flattened.array.equal!isClose(expectedRgb));
     }
 
     import std.random : uniform;
