@@ -76,7 +76,7 @@ GLuint loadTexture(ubyte* imptr, uint w, uint h){
     glGenTextures(1, &textureId); 
     glBindTexture(GL_TEXTURE_2D, textureId);
     
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -345,12 +345,12 @@ struct GLSolidCircle {
         this.shaderProgram = shaderProgram;      
 
         enum quality = 0.125;
-	    int triangleAmount = cast(int)(300 * quality);
+        int triangleAmount = cast(int)(300 * quality);
 
-		foreach(i; 0..triangleAmount) { 
-		    vertices.put(0.0f);
-			vertices.put(0.0f);
-		}
+        foreach(i; 0..triangleAmount) { 
+            vertices.put(0.0f);
+            vertices.put(0.0f);
+        }
 
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -361,14 +361,14 @@ struct GLSolidCircle {
         import std.range : chunks;
 
         enum quality = 0.125;
-	    int triangleAmount = cast(int)(300 * quality);
+        int triangleAmount = cast(int)(300 * quality);
         
         int i;
         foreach(ref c; chunks(vertices.data[], 2)) {
-		    c[0] = x + (radius * cos(i *  2*PI / float(triangleAmount))); 
+            c[0] = x + (radius * cos(i *  2*PI / float(triangleAmount))); 
             c[1] = y + (radius * sin(i * 2*PI / float(triangleAmount)));
             ++i;
-		}
+        }
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, vertices.length * float.sizeof, vertices.data.ptr, GL_STREAM_DRAW);
