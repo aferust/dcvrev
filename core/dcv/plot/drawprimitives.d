@@ -453,18 +453,7 @@ struct GLTexturedRect {
             r.x+r.w, r.y+r.h,  1.0f, 1.0f,
             r.x+r.w, r.y,      1.0f, 0.0f
         ];
-
-        /*
-        alias Transform3D = Transform!(float, 3);
-        alias Vec3 = Vector!(float, 3);
-
         
-        auto zeroTranslation = Vec3(-r.x - r.w*0.5, -r.y - r.h*0.5);
-        auto model = Transform3D()
-            .translate(zeroTranslation)
-            .rotateZ(angle)
-            .translate(-zeroTranslation);
-        */
         auto model = getModel(r, angle);
         
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
