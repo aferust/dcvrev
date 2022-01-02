@@ -27,7 +27,8 @@
                 "mir-random": "2.2.19",
                 "imageformats": "7.0.2",
                 "bindbc-glfw": "~>1.0.0",
-                "bindbc-opengl": "~>1.0.0"
+                "bindbc-opengl": "~>1.0.0",
+                "bcaa": "0.0.8"
             },
             "versions": ["GLFW_31"],
             "configurations": [
