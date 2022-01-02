@@ -287,6 +287,8 @@ private auto _assemble_contours(Tuple!(Point, Point)[] segments){
             ends[to_point] = tuple(head, head_num);
         }
     }
+
+    debug assert(starts.length == 0 && ends.length == 0, "Unexpected segment state");
     
     import std.algorithm.sorting : sort;
 
