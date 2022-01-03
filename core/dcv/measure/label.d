@@ -28,6 +28,9 @@ Label connected components in 2-D binary image
 Params:
     input = Input slice of 2-D binary image (Slice!(Iterator, 2LU, kind)) .
 */
+
+@nogc nothrow:
+
 auto bwlabel(alias Conn = 8, alias Method = 3, SliceKind kind, Iterator)(auto ref Slice!(Iterator, 2LU, kind) input)
 in
 {
@@ -53,7 +56,7 @@ do
 Params:
     label = Label matrix.
 */
-auto label2rgb(InputType)(InputType label) @nogc nothrow
+auto label2rgb(InputType)(InputType label)
 {
     import mir.random;
     import mir.random.variable;
@@ -265,6 +268,7 @@ struct LabelizerV3{
         return label_cython!(_conn)(input);
     }
 }
+private :
 
 alias DTYPE = long;
 
@@ -326,10 +330,10 @@ void get_bginfo(DTYPE_t background_val, bginfo* ret){
     ret.background_label = 0;
 }
 
-void get_shape_info(size_t[] inarr_shape, shape_info *res){
+void get_shape_info(size_t[] inarr_shape, shape_info* res){
     import std.algorithm.sorting;
-    import std.array;
-    import std.exception, std.format;
+    import mir.rc;
+    debug import std.exception, std.format;
     /+
     Precalculates all the needed data from the input array shape
     and stores them in the shape_info struct.
@@ -341,7 +345,7 @@ void get_shape_info(size_t[] inarr_shape, shape_info *res){
     // good_shape (i.e. the array with axis swapped) (1, 3, 4) is OK.
     // Having an axis length of 1 when an axis on the left is longer than 1
     // (in this case, it has length of 3) is NOT ALLOWED.
-    size_t[] good_shape = inarr_shape.sort().array;
+    auto good_shape = inarr_shape.sort().rcarray;
 
     res.ndim = inarr_shape.length;
     if( res.ndim == 1){
@@ -351,11 +355,12 @@ void get_shape_info(size_t[] inarr_shape, shape_info *res){
         res.x = inarr_shape[1];
         res.y = inarr_shape[0];
         res.ravel_index = &ravel_index2D;
-        if (res.x == 1 && res.y > 1)
+        if (res.x == 1 && res.y > 1){
             // Should not occur, but better be safe than sorry
-            throw new Exception(
+            debug throw new Exception(
                 format("Swap axis of your %s array so it has a %s shape",
                 inarr_shape.stringof, good_shape.stringof));
+        }
     }
     else if (res.ndim == 3){
         res.x = inarr_shape[2];
@@ -363,17 +368,18 @@ void get_shape_info(size_t[] inarr_shape, shape_info *res){
         res.z = inarr_shape[0];
         res.ravel_index = &ravel_index3D;
         if ((res.x == 1 && res.y > 1)
-            || res.y == 1 && res.z > 1)
+            || res.y == 1 && res.z > 1){
             // Should not occur, but better be safe than sorry
-            throw new Exception(
+            debug throw new Exception(
                 format("Swap axes of your %s array so it has a %s shape",
                 inarr_shape.stringof, good_shape.stringof));
+        }
     }
-    else
-        throw new Exception(
+    else{
+        debug throw new Exception(
             format("Only for images of dimension 1-3 are supported, got a %sD one",
                  res.ndim));
-
+    }
     res.numels = res.x * res.y * res.z;
 
     // When reading this for the first time, look at the diagram by the enum

@@ -9,32 +9,39 @@ import dcv.imgproc;
 import dcv.measure;
 
 import mir.ndslice;
+import mir.math.stat: mean;
 
 int main(string[] args)
 {
     Image img = imread("../data/test_labels.png");
 
     Slice!(ubyte*, 2) gray = img.sliced.rgb2gray;
-    auto hist = calcHistogram(gray.flattened);
+    auto hist = calcHistogram(gray.flattened); // compute histogram
     
-    auto thr = getOtsuThresholdValue(hist);
+    auto thr = getOtsuThresholdValue(hist); // determine a threshold
     
-    auto imbin = threshold!ubyte(gray, cast(ubyte)thr);
+    auto imbin = threshold!ubyte(gray, cast(ubyte)thr); // threshold the image
     
-    auto labels = bwlabel(imbin);
+    auto labels = bwlabel(imbin); // create label matrix
 
-    auto cntrs = findContours(imbin);
+    auto cntrs = findContours(imbin); // find contours (binary boundaries)
     
-    foreach(contour; cntrs){
+    foreach(contour; cntrs) // iterate over the regions
+    { 
         auto moments = calculateMoments(contour, imbin);
-        writeln("Orientation: ", ellipseFit(moments).angle);
-        writeln("convexHull: ", convexHull(contour));
+        auto ellipse = ellipseFit(moments);
+        writeln("Orientation: ", ellipse.angle);
+        writeln("Minor axis length: ", ellipse.minor);
+        writeln("Major axis length: ", ellipse.major);
+        writefln("Centroid x: %f Centroid y; %f", contour[0..$, 0].mean, contour[0..$, 1].mean);
+        writeln("Bounding box: ", boundingBox(contour));
+        writeln("convexHull indices: ", convexHull(contour)[]);
         writeln("Area: ", moments.m00); // or contour.contourArea
         writeln("Perimeter: ", contour.arcLength);
     }
     
-    auto labelimg = label2rgb(labels); // a nice util to visualize the label matrix
-    auto cimg = contours2image(cntrs, imbin.shape[0], imbin.shape[1]);
+    auto labelimg = label2rgb(labels); // visualize the label matrix
+    auto cimg = contours2image(cntrs, imbin.shape[0], imbin.shape[1]); // visualize the contours
 
     imshow(cimg, "cimg");
     imshow(labelimg, "labelimg");
