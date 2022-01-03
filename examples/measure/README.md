@@ -55,6 +55,9 @@ int main(string[] args)
 
     imshow(cimg, "cimg");
     imshow(labelimg, "labelimg");
+
+    cimg.imwrite(ImageFormat.IF_MONO, "result/contours.png");
+    labelimg.imwrite(ImageFormat.IF_RGB, "result/labels.png");
     
     waitKey();
     
