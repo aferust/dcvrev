@@ -1,7 +1,15 @@
+# Binary region analysis
 
-import std.stdio;
-import dcv.io.image : imread, imwrite;
+* input image
+![](../data/test_labels.png)
 
+* output contours
+![](result/contours.png)
+
+* output labels
+![](result/labels.png)
+
+```d
 import dcv.core;
 import dcv.io.image;
 import dcv.plot;
@@ -45,12 +53,9 @@ int main(string[] args)
 
     imshow(cimg, "cimg");
     imshow(labelimg, "labelimg");
-
-    // write to disk
-    cimg.imwrite(ImageFormat.IF_MONO, "results/contours.png");
-    labelimg.imwrite(ImageFormat.IF_RGB, "results/labels.png");
     
     waitKey();
     
     return 0;
 }
+```
