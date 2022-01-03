@@ -1,14 +1,16 @@
 # Binary region analysis
 
-- input image
+## input image
+
 ![](../data/test_labels.png)
 
-- output contours
+## output contours
 ![](result/contours.png)
 
-- output labels
+## output labels
 ![](result/labels.png)
 
+## code
 ```d
 import dcv.core;
 import dcv.io.image;
