@@ -294,8 +294,14 @@ private auto _assemble_contours(Tuple!(Point, Point)[] segments){
 
     auto cts = RCArray!Contour(contours.length);
     size_t i;
+    
+    auto _keys = contours.keys;
 
-    foreach (k; contours.keys.sort)
+    scope(exit){
+        Mallocator.instance.dispose(_keys);
+    }
+    
+    foreach (k; _keys.sort)
     {
         auto tmp = contours[k];
         auto _c = tmp[].rcarray!Point;
