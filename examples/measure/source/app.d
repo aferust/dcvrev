@@ -47,8 +47,8 @@ int main(string[] args)
     imshow(labelimg, "labelimg");
 
     // write to disk
-    cimg.imwrite(ImageFormat.IF_MONO, "results/contours.png");
-    labelimg.imwrite(ImageFormat.IF_RGB, "results/labels.png");
+    cimg.imwrite(ImageFormat.IF_MONO, "result/contours.png");
+    labelimg.imwrite(ImageFormat.IF_RGB, "result/labels.png");
     
     waitKey();
     
