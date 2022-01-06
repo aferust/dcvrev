@@ -167,14 +167,15 @@ private auto _get_contour_segments(InputType)
         }
     }
 
-    TPP[] ret = (cast(TPP*)malloc(TPP.sizeof*segments.length))[0..segments.length];
-    segments.moveDataAndEmplaceTo(ret); // freed in _assemble_contours
+    auto ret = RCArray!Point(segments.length * 2);
+    ret.ptr[0..segments.length*2] = (cast(Point*)segments.data[].ptr)[0..segments.length * 2];
 
     return ret;
 }
 
-private auto _assemble_contours(Tuple!(Point, Point)[] segments){ 
+private auto _assemble_contours(Segments)(auto ref Segments segments){ 
     import std.algorithm.comparison : equal;
+    import mir.ndslice: chunks;
 
     size_t current_index = 0;
     
@@ -189,12 +190,11 @@ private auto _assemble_contours(Tuple!(Point, Point)[] segments){
         starts.free;
         ends.free;
         contours.free;
-        free(cast(void*)segments.ptr);
     }
     
-    foreach(tupelem; segments){
-        Point from_point = tupelem[0];
-        Point to_point = tupelem[1];
+    foreach(elem; segments.asSlice.chunks(2)){
+        Point from_point = elem[0];
+        Point to_point = elem[1];
 
         // Ignore degenerate segments.
         // This happens when (and only when) one vertex of the square is
@@ -290,18 +290,14 @@ private auto _assemble_contours(Tuple!(Point, Point)[] segments){
 
     debug assert(starts.length == 0 && ends.length == 0, "Unexpected segment state");
     
-    import std.algorithm.sorting : sort;
+    import mir.ndslice.sorting : sort;
 
     auto cts = RCArray!Contour(contours.length);
     size_t i;
     
-    auto _keys = contours.keys;
-
-    scope(exit){
-        Mallocator.instance.dispose(_keys);
-    }
+    auto _keys = contours.byKey.rcarray.asSlice.sort;
     
-    foreach (k; _keys.sort)
+    foreach (k; _keys)
     {
         auto tmp = contours[k];
         auto _c = tmp[].rcarray!Point;
