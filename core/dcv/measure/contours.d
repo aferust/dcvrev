@@ -177,6 +177,8 @@ private auto _assemble_contours(Segments)(auto ref Segments segments){
     import std.algorithm.comparison : equal;
     import mir.ndslice: chunks;
 
+    debug nm = nf = 0;
+
     size_t current_index = 0;
     
     alias DLP = dlist!(Point);
