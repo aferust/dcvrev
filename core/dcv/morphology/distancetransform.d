@@ -12,7 +12,8 @@ Params:
 
 Returns distance image of Slice!(RCI!int, 2LU, Contiguous)
 */
-auto distanceTransform(InputImg)(InputImg img){
+auto distanceTransform(InputImg)(InputImg img) @nogc nothrow
+{
     auto rows = img.shape[0];
     auto cols = img.shape[1];
     Slice!(RCI!int, 2LU, Contiguous) dt = uninitRCslice!int(rows, cols);
