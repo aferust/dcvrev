@@ -8,7 +8,7 @@ import mir.rc;
 /** Apply distance transform using chamfer distance algorithm.
 
 Params:
-    image = Input binary image of ubyte (0 for background). Agnostic to SliceKind
+    image = Input binary image (0 for background). Agnostic to SliceKind
 
 Returns distance image of Slice!(RCI!int, 2LU, Contiguous)
 */
