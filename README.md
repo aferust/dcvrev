@@ -1,5 +1,7 @@
 # ![DCV](https://github.com/libmir/dcv/raw/gh-pages/images/dcv_logo.png)
 
+- Since my work is merged to the libmir/dcv, this repo is archived now.
+
 [![Build Status](https://travis-ci.org/libmir/dcv.svg?branch=master)](https://travis-ci.org/libmir/dcv) 
 [![codecov.io](https://codecov.io/github/libmir/dcv/coverage.svg?branch=master)](https://codecov.io/github/libmir/dcv?branch=master) 
 [![DUB](https://img.shields.io/dub/v/dcv.svg)](http://code.dlang.org/packages/dcv) 
